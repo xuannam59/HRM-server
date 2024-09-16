@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import User from "../models/user.model";
 import md5 from "md5";
+import getAccessToken from "../utils/getAccessToken";
 
 // [POST] /auth/register
 export const register = async (req: Request, res: Response) => {
@@ -26,13 +27,16 @@ export const register = async (req: Request, res: Response) => {
             role: "user"
         }
 
-        const newUser = new User(data);
+        const newUser: any = new User(data);
         await newUser.save();
 
-        delete newUser["password"];
+
+        delete newUser._doc.password; // remove property password
+
+        console.log(newUser);
         res.status(200).json({
             message: "Register",
-            data: body
+            data: newUser,
         });
     } catch (error: any) {
         res.status(404).json({
@@ -44,11 +48,28 @@ export const register = async (req: Request, res: Response) => {
 // [POST] /auth/login
 export const login = async (req: Request, res: Response) => {
     const body = req.body;
-    console.log(body);
+    const { email, password } = body;
     try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new Error("Tài khoản không tồn tại!");
+        }
+        if (md5(password) !== user.password) {
+            throw new Error("Mật khẩu không chính xác!");
+        }
+
+        const infoUser: any = await User.findOne({ email }).select("-password");
+
         res.status(200).json({
             message: "login",
-            data: body
+            data: {
+                ...infoUser._doc,
+                token: getAccessToken({
+                    id: infoUser._id,
+                    email: infoUser.email,
+                    rule: 0
+                }),
+            }
         });
     } catch (error: any) {
         res.status(404).json({
