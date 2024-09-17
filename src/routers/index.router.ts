@@ -1,9 +1,14 @@
 import { Express } from "express";
-import { UserRouter } from "./user.router";
+import { userRouter } from "./user.router";
+import { teacherRouter } from "./teacher.router";
+import { verifyToken } from "../../middlewares/verifyToken.middleware";
 
-const Router = (app: Express) => {
+const routerApiV1 = (app: Express) => {
     const api: string = "/api/v1"
-    app.use(api + "/auth", UserRouter);
+
+    app.use(api + "/auth", userRouter);
+
+    app.use(api + "/school", verifyToken, teacherRouter);
 }
 
-export default Router;
+export default routerApiV1;

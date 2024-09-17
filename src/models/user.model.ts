@@ -20,6 +20,10 @@ const userSchema = new Schema({
     phone: String,
     avatar: String,
     role: String,
+    deleted: {
+        type: Boolean,
+        default: false
+    },
     deleteAt: Date,
     deleteBy: String
 }, {

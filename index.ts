@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import * as database from "./src/config/database.config";
-import Router from "./src/routers/index.router";
+import routerApiV1 from "./src/routers/index.router";
 import cors from "cors";
 dotenv.config();
 
@@ -12,7 +12,7 @@ app.use(cors())
 app.use(express.json());
 
 // router
-Router(app);
+routerApiV1(app);
 
 // connect database
 database.connect()

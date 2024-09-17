@@ -13,7 +13,10 @@ export const register = async (req: Request, res: Response) => {
         confirmPassword
     } = body
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({
+            email: email,
+            deleted: false
+        });
         if (user) {
             throw new Error("Tài khoản đã tồn tại");
         }
@@ -52,7 +55,10 @@ export const loginWithGoogle = async (req: Request, res: Response) => {
         email
     } = body
     try {
-        const user: any = await User.findOne({ email });
+        const user: any = await User.findOne({
+            email: email,
+            deleted: false
+        });
         if (user) {
             delete user._doc.password;
             res.status(200).json({
@@ -103,7 +109,10 @@ export const login = async (req: Request, res: Response) => {
     const body = req.body;
     const { email, password } = body;
     try {
-        const user: any = await User.findOne({ email });
+        const user: any = await User.findOne({
+            email: email,
+            deleted: false
+        });
         if (!user || md5(password) !== user.password) {
             throw new Error("Đăng nhập thất bại!, vui lòng kiểm tra lại Email/Password và thử lại");
         }
@@ -127,5 +136,28 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
-
-
+export const refreshToken = async (req: Request, res: Response) => {
+    const { id } = req.query;
+    try {
+        const user = await User.findOne({
+            _id: id,
+            deleted: false
+        });
+        if (!user) {
+            throw new Error("User not found!");
+        }
+        const token = getAccessToken({
+            id: user._id,
+            email: user.email,
+            rule: user.rule
+        })
+        res.status(200).json({
+            message: "refresh token",
+            token: token
+        });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        });
+    }
+}
