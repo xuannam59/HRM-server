@@ -13,6 +13,10 @@ const userSchema = new Schema({
         type: String,
         require: true
     },
+    rule: {
+        type: Number,
+        default: 0
+    },
     phone: String,
     avatar: String,
     role: String,
