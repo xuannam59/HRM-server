@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import Teacher from "../models/teacher.model";
 import md5 from "md5";
 
+// [GET] /teachers
 export const getTeachers = async (req: Request, res: Response) => {
 
     try {
-        const teacher = await Teacher.find({});
+        const teacher = await Teacher.find({ deleted: false });
         teacher.forEach((item: any) => {
             delete item.password;
         });
@@ -21,6 +22,7 @@ export const getTeachers = async (req: Request, res: Response) => {
 
 }
 
+// [POST] /teachers/create
 export const createTeacher = async (req: Request, res: Response) => {
     try {
         const data = req.body;
@@ -48,6 +50,7 @@ export const createTeacher = async (req: Request, res: Response) => {
     }
 }
 
+// [POST] /teachers/update/:id
 export const updateTeacher = async (req: Request, res: Response) => {
     const data = req.body;
     const { id } = req.params;
@@ -71,6 +74,29 @@ export const updateTeacher = async (req: Request, res: Response) => {
             message: "Update Successfully",
             data: []
         });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+// [DELETE] /teacher/delete/:id
+export const deleteTeacher = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        const teacher = await Teacher.findOne({ _id: id, deleted: false });
+        if (!teacher) {
+            throw new Error("không tìm thấy giáo viên");
+        }
+
+        await Teacher.updateOne({
+            _id: id
+        }, { deleted: true });
+        res.status(200).json({
+            message: "Delete Success",
+            data: []
+        })
     } catch (error: any) {
         res.status(404).json({
             message: error.message

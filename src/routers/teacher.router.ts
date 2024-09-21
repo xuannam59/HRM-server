@@ -9,4 +9,6 @@ router.post("/create", controller.createTeacher);
 
 router.put("/update/:id", controller.updateTeacher);
 
+router.delete("/delete/:id", controller.deleteTeacher);
+
 export const teacherRouter: Router = router;
