@@ -4,14 +4,37 @@ import md5 from "md5";
 
 // [GET] /teachers
 export const getTeachers = async (req: Request, res: Response) => {
-
+    let { current, pageSize, status } = req.query
     try {
-        const teacher = await Teacher.find({ deleted: false });
+        const find: any = {
+            deleted: false
+        };
+        if (status !== "") {
+            find.status = status
+        }
+        const total = await Teacher.countDocuments(find);
+        const objectPagination: {
+            current: number,
+            pageSize: number,
+            total: number,
+        } = {
+            current: Number(current),
+            pageSize: Number(pageSize),
+            total: total,
+        };
+
+        const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
+
+        const teacher = await Teacher
+            .find(find)
+            .skip(skip)
+            .limit(objectPagination.pageSize);
         teacher.forEach((item: any) => {
             delete item.password;
         });
         res.status(200).json({
             message: "Teacher",
+            meta: objectPagination,
             data: teacher,
         });
     } catch (error: any) {
