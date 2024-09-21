@@ -2,20 +2,24 @@ import mongoose, { Schema } from "mongoose";
 
 const teacherSchema = new Schema({
     teacherId: String,
-    email: String,
-    avatar: String,
     fullName: String,
-    sex: String,
-    ethnicGroup: String,
-    technical: String,
-    passport: String,
-    phoneNumber: String,
     birdDay: Date,
-    status: String,
+    email: String,
+    passport: String,
+    avatar: String,
+    gender: String,
+    subject: String,
+    phoneNumber: String,
+    class: String,
+    status: {
+        type: String,
+        default: "active"
+    },
     deleted: {
         type: Boolean,
         default: false
-    }
+    },
+    slug: String
 }, {
     timestamps: true,
 });

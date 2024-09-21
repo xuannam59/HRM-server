@@ -8,7 +8,7 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/auth", userRouter);
 
-    app.use(api + "/school", verifyToken, teacherRouter);
+    app.use(api + "/teachers", verifyToken, teacherRouter);
 }
 
 export default routerApiV1;

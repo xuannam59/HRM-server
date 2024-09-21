@@ -3,6 +3,8 @@ import * as controller from "../controllers/teacher.controller";
 
 const router: Router = Router();
 
-router.get("/teachers", controller.getTeachers);
+router.get("/", controller.getTeachers);
+
+router.post("/create", controller.createTeacher);
 
 export const teacherRouter: Router = router;
