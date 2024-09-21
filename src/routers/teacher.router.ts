@@ -7,4 +7,6 @@ router.get("/", controller.getTeachers);
 
 router.post("/create", controller.createTeacher);
 
+router.put("/update/:id", controller.updateTeacher);
+
 export const teacherRouter: Router = router;

@@ -3,7 +3,6 @@ import mongoose, { Schema } from "mongoose";
 const teacherSchema = new Schema({
     teacherId: String,
     fullName: String,
-    birdDay: Date,
     email: String,
     passport: String,
     avatar: String,
@@ -11,10 +10,7 @@ const teacherSchema = new Schema({
     subject: String,
     phoneNumber: String,
     class: String,
-    status: {
-        type: String,
-        default: "active"
-    },
+    status: String,
     deleted: {
         type: Boolean,
         default: false

@@ -48,4 +48,32 @@ export const createTeacher = async (req: Request, res: Response) => {
     }
 }
 
+export const updateTeacher = async (req: Request, res: Response) => {
+    const data = req.body;
+    const { id } = req.params;
+    try {
+        const emailExist = await Teacher.findOne({
+            _id: { $ne: id },
+            email: data.email,
+            deleted: false
+        });
 
+        if (emailExist) {
+            throw new Error("Email trùng với một giáo viên khác, vui lòng nhập lại");
+        }
+
+        if (data.password) {
+            data.password = md5(data.password);
+        }
+        await Teacher.updateOne({ _id: id }, data);
+
+        res.status(200).json({
+            message: "Update Successfully",
+            data: []
+        });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
