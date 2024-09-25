@@ -79,7 +79,8 @@ export const loginWithGoogle = async (req: Request, res: Response) => {
             fullName: body.fullName,
             email: body.email,
             password: body.password,
-            role: "user"
+            role: "user",
+            avatar: body.avatar
         }
 
         const newUser: any = new User(data);

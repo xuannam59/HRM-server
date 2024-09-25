@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { userRouter } from "./user.router";
-import { teacherRouter } from "./teacher.router";
+import { employeeRouter } from "./employee.router";
 import { verifyToken } from "../middlewares/verifyToken.middleware";
 
 const routerApiV1 = (app: Express) => {
@@ -8,7 +8,7 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/auth", userRouter);
 
-    app.use(api + "/teachers", verifyToken, teacherRouter);
+    app.use(api + "/employees", verifyToken, employeeRouter);
 }
 
 export default routerApiV1;
