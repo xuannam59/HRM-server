@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import Position from "../models/position.model";
-import User from "../models/user.model";
-import { isObjectIdOrHexString } from "mongoose";
 
 // [GET] /positions
 export const getPositions = async (req: Request, res: Response) => {
