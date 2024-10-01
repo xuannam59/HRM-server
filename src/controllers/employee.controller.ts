@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import Employee from "../models/employee.model";
 import md5 from "md5";
+import Position from "../models/position.model";
+import Level from "../models/level.model";
+import Specialize from "../models/specialize.modal";
 
 // [GET] /employees
 export const getEmployees = async (req: Request, res: Response) => {
@@ -9,7 +12,7 @@ export const getEmployees = async (req: Request, res: Response) => {
         const find: any = {
             deleted: false
         };
-        if (status !== "") {
+        if (status) {
             find.status = status
         }
         const total = await Employee.countDocuments(find);
@@ -25,19 +28,38 @@ export const getEmployees = async (req: Request, res: Response) => {
 
         const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
 
-        const employee = await Employee
+        const employees: any = await Employee
             .find(find)
             .skip(skip)
             .limit(objectPagination.pageSize)
             .sort({ createdAt: "desc" });
 
-        employee.forEach((item: any) => {
-            delete item.password;
-        });
+        const items: any[] = [];
+        for (const item of employees) {
+            const infoPosition = await Position.findOne({
+                _id: item.positionId,
+                deleted: false
+            }).select("title");
+            const infoLevel = await Level.findOne({
+                _id: item.levelId,
+                deleted: false
+            });
+            const infoSpecialize = await Specialize.findOne({
+                _id: item.specializeId,
+                deleted: false
+            });
+            items.push({
+                ...item._doc,
+                infoPosition: infoPosition?.title,
+                infoLevel: infoLevel?.title,
+                infoSpecialize: infoSpecialize?.title
+            })
+        }
+
         res.status(200).json({
             message: "employee",
             meta: objectPagination,
-            data: employee,
+            data: items,
         });
     } catch (error: any) {
         res.status(404).json({

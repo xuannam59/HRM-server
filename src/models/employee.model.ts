@@ -11,7 +11,10 @@ const employeeSchema = new mongoose.Schema({
     passport: String,
     email: String,
     status: String,
-    position: Number,
+    positionId: String,
+    levelId: String,
+    specializeId: String,
+    deportmentId: String,
     deleted: {
         type: Boolean,
         default: false

@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import Position from "../models/position.model";
+import Specialize from "../models/specialize.modal";
 import User from "../models/user.model";
 
-// [GET] /positions
-export const getPositions = async (req: Request, res: Response) => {
+// [GET] /specializes
+export const getSpecializes = async (req: Request, res: Response) => {
     const { current, pageSize } = req.query
     try {
-        const total = await Position.countDocuments({ deleted: false });
+        const total = await Specialize.countDocuments({ deleted: false });
         const objectPagination: {
             current: number,
             pageSize: number,
@@ -18,13 +19,13 @@ export const getPositions = async (req: Request, res: Response) => {
         };
 
         const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
-        const positions: any = await Position
+        const specializes: any = await Specialize
             .find({ deleted: false, })
             .skip(skip)
             .limit(objectPagination.pageSize);
 
         const items: any[] = [];
-        for (const item of positions) {
+        for (const item of specializes) {
             const infoUser = await User.findOne({
                 _id: item.createdBy,
                 deleted: false
@@ -36,7 +37,7 @@ export const getPositions = async (req: Request, res: Response) => {
         }
 
         res.status(200).json({
-            message: "Get position",
+            message: "Get specialize",
             data: items,
             meta: objectPagination
         });
@@ -47,16 +48,16 @@ export const getPositions = async (req: Request, res: Response) => {
     }
 }
 
-//[GET]/positions/all
-export const getAllPosition = async (req: Request, res: Response) => {
+//[GET]/specializes/all
+export const getAllSpecialize = async (req: Request, res: Response) => {
     try {
-        const allPosition = await Position.find({
+        const allSpecialize = await Specialize.find({
             deleted: false
         });
 
         res.status(200).json({
-            message: "All position",
-            data: allPosition
+            message: "All specialize",
+            data: allSpecialize
         });
     } catch (error: any) {
         res.status(404).json({
@@ -66,24 +67,24 @@ export const getAllPosition = async (req: Request, res: Response) => {
 }
 
 
-// [POST] /positions/create
-export const createPosition = async (req: Request, res: Response) => {
+// [POST] /specializes/create
+export const createSpecialize = async (req: Request, res: Response) => {
     const data = req.body;
     try {
         delete data.createdAt;
-        const position = await Position.findOne({
+        const specialize = await Specialize.findOne({
             title: data.title,
             deleted: false
         });
-        if (position) {
+        if (specialize) {
             throw new Error("Chữ vụ này đã có!");
         }
 
-        const newPosition = new Position(data);
-        await newPosition.save();
+        const newSpecialize = new Specialize(data);
+        await newSpecialize.save();
         res.status(200).json({
-            message: "Create position",
-            data: newPosition
+            message: "Create specialize",
+            data: newSpecialize
         });
     } catch (error: any) {
         res.status(404).json({
@@ -92,21 +93,21 @@ export const createPosition = async (req: Request, res: Response) => {
     }
 }
 
-// [POST] /positions/edit/:id
-export const updatePosition = async (req: Request, res: Response) => {
+// [POST] /specializes/edit/:id
+export const updateSpecialize = async (req: Request, res: Response) => {
     const data = req.body;
     const { id } = req.params;
     try {
-        const position = await Position.findOne({
+        const specialize = await Specialize.findOne({
             _id: id,
             deleted: false
         });
-        if (!position) {
+        if (!specialize) {
             throw new Error("Chữ vụ này không tồn tại!");
         }
-        await Position.updateOne({ _id: id }, data);
+        await Specialize.updateOne({ _id: id }, data);
         res.status(200).json({
-            message: "Update position",
+            message: "Update specialize",
             data: []
         });
     } catch (error: any) {
@@ -116,20 +117,20 @@ export const updatePosition = async (req: Request, res: Response) => {
     }
 }
 
-// [POST] /positions/delete/:id
-export const deletePosition = async (req: Request, res: Response) => {
+// [POST] /specializes/delete/:id
+export const deleteSpecialize = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const position = await Position.findOne({
+        const specialize = await Specialize.findOne({
             _id: id,
             deleted: false
         });
-        if (!position) {
-            throw new Error("Chữ vụ này không tồn tại!");
+        if (!specialize) {
+            throw new Error("Chuyên môn này không tồn tại!");
         }
-        await Position.deleteOne({ _id: id });
+        await Specialize.deleteOne({ _id: id });
         res.status(200).json({
-            message: "Delete position",
+            message: "Delete specialize",
             data: []
         });
     } catch (error: any) {
