@@ -147,7 +147,6 @@ export const getListEmployee = async (req: Request, res: Response) => {
             departmentId: "",
             deleted: false
         });
-        console.log(listEmployee);
         res.status(200).json({
             message: "Department Employee",
             data: listEmployee,

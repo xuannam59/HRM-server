@@ -121,8 +121,6 @@ export const createEmployee = async (req: Request, res: Response) => {
             }, {
                 $push: { employeeList: { employeeId: newEmployee._id } }
             });
-        } else {
-            throw new Error("Phòng ban không hợp lệ");
         }
         res.status(200).json({
             message: "Create Success",
@@ -187,7 +185,7 @@ export const deleteEmployee = async (req: Request, res: Response) => {
     try {
         const employee = await Employee.findOne({ _id: id, deleted: false });
         if (!employee) {
-            throw new Error("không tìm thấy giáo viên");
+            throw new Error("không tìm thấy nhân viên");
         }
 
         await Employee.updateOne({
@@ -219,7 +217,7 @@ export const employeeDetail = async (req: Request, res: Response) => {
         })
     } catch (error: any) {
         res.status(404).json({
-            message: "Không tìm thấy giáo viên"
+            message: "Không tìm thấy nhân viên"
         })
     }
 }
