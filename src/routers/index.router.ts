@@ -5,6 +5,7 @@ import { verifyToken } from "../middlewares/verifyToken.middleware";
 import { positionRouter } from "./position.router";
 import { levelRouter } from "./level.router";
 import { specializeRouter } from "./specialize.router";
+import { departmentRouter } from "./department.router";
 
 const routerApiV1 = (app: Express) => {
     const api: string = "/api/v1"
@@ -19,6 +20,8 @@ const routerApiV1 = (app: Express) => {
     app.use(api + "/levels", levelRouter);
 
     app.use(api + "/specializes", specializeRouter);
+
+    app.use(api + "/departments", departmentRouter);
 }
 
 export default routerApiV1;

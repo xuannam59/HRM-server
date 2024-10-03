@@ -14,7 +14,10 @@ const employeeSchema = new mongoose.Schema({
     positionId: String,
     levelId: String,
     specializeId: String,
-    deportmentId: String,
+    departmentId: {
+        type: String,
+        default: ""
+    },
     deleted: {
         type: Boolean,
         default: false

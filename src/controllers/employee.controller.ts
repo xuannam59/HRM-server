@@ -4,6 +4,7 @@ import md5 from "md5";
 import Position from "../models/position.model";
 import Level from "../models/level.model";
 import Specialize from "../models/specialize.modal";
+import Department from "../models/department.model";
 
 // [GET] /employees
 export const getEmployees = async (req: Request, res: Response) => {
@@ -48,11 +49,21 @@ export const getEmployees = async (req: Request, res: Response) => {
                 _id: item.specializeId,
                 deleted: false
             });
+            let titleDepartmentId: string = "";
+            if (item.departmentId !== "") {
+                const infoDepartment = await Department.findOne({
+                    _id: item.departmentId,
+                    deleted: false
+                });
+                titleDepartmentId = infoDepartment?.title;
+            }
+
             items.push({
                 ...item._doc,
                 infoPosition: infoPosition?.title,
                 infoLevel: infoLevel?.title,
-                infoSpecialize: infoSpecialize?.title
+                infoSpecialize: infoSpecialize?.title,
+                infoDepartment: titleDepartmentId,
             })
         }
 
@@ -94,17 +105,25 @@ export const createEmployee = async (req: Request, res: Response) => {
         const total = await Employee.countDocuments();
         data.employeeId = "MNV2024" + total;
         const employee = await Employee.findOne({
-            email: data.email,
+            passport: data.passport,
             deleted: false
         });
 
         if (employee) {
-            throw new Error("Email trùng với nhân viên khác, vui lòng nhập email khác");
+            throw new Error("Vui lòng nhập đúng thẻ cccd của nhân viên");
         }
 
         const newEmployee = new Employee(data);
         await newEmployee.save();
-
+        if (data.departmentId) {
+            await Department.updateOne({
+                _id: newEmployee.departmentId,
+            }, {
+                $push: { employeeList: { employeeId: newEmployee._id } }
+            });
+        } else {
+            throw new Error("Phòng ban không hợp lệ");
+        }
         res.status(200).json({
             message: "Create Success",
             data: []
@@ -121,21 +140,36 @@ export const updateEmployee = async (req: Request, res: Response) => {
     const data = req.body;
     const { id } = req.params;
     try {
-        const emailExist = await Employee.findOne({
-            _id: { $ne: id },
-            email: data.email,
+        const employee = await Employee.findOne({
+            _id: id,
+            passport: data.passport,
             deleted: false
         });
-
-        if (emailExist) {
-            throw new Error("Email trùng với một giáo viên khác, vui lòng nhập lại");
+        if (!employee) {
+            throw new Error("Nhân viện không hợp lệ!");
         }
 
         if (data.password) {
             data.password = md5(data.password);
         }
-        await Employee.updateOne({ _id: id }, data);
 
+        if (data.departmentId) {
+            await Department.updateOne({
+                "employeeList.employeeId": employee._id
+            }, {
+                $pull: { employeeList: { employeeId: employee._id } }
+            });
+
+            await Department.updateOne({
+                _id: data.departmentId
+            }, {
+                $push: { employeeList: { employeeId: employee._id } }
+            });
+        } else {
+            throw new Error("Phòng ban không hợp lệ");
+        }
+
+        await Employee.updateOne({ _id: id }, data);
         res.status(200).json({
             message: "Update Successfully",
             data: []
