@@ -3,6 +3,50 @@ import User from "../models/user.model";
 import md5 from "md5";
 import getAccessToken from "../utils/getAccessToken";
 import { generateRandomNumber } from "../utils/generateRandomText";
+import Employees from "../models/employee.model";
+
+// [GET] /user
+export const getUsers = async (req: Request, res: Response) => {
+    let { current, pageSize, status } = req.query
+    try {
+        const find: any = {
+            deleted: false
+        };
+        if (status) {
+            find.status = status
+        }
+        const total = await User.countDocuments(find);
+        const objectPagination: {
+            current: number,
+            pageSize: number,
+            total: number,
+        } = {
+            current: Number(current),
+            pageSize: Number(pageSize),
+            total: total,
+        };
+
+        const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
+
+        const employees: any = await User
+            .find(find)
+            .skip(skip)
+            .limit(objectPagination.pageSize)
+            .sort({ createdAt: "desc" })
+            .select("-password");
+
+        res.status(200).json({
+            message: "employee",
+            meta: objectPagination,
+            data: employees,
+        });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.massage
+        });
+    }
+
+}
 
 // [POST] /auth/register
 export const register = async (req: Request, res: Response) => {
@@ -10,7 +54,7 @@ export const register = async (req: Request, res: Response) => {
     const {
         email,
         password,
-        confirmPassword
+        confirmPassword,
     } = body
     try {
         const user = await User.findOne({
@@ -28,12 +72,19 @@ export const register = async (req: Request, res: Response) => {
             fullName: body.fullName,
             email: body.email,
             password: body.password,
-            role: "user"
+            role: body.role,
+            employeeId: body.employeeId,
         }
 
         const newUser: any = new User(data);
         await newUser.save();
 
+        await Employees.updateOne(
+            { _id: newUser.employeeId },
+            {
+                userId: newUser._id,
+                role: body.role
+            });
 
         delete newUser._doc.password; // remove property password
 

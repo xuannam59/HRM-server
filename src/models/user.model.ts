@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
     fullName: String,
     email: String,
     password: String,
+    employeeId: String,
     rule: {
         type: Number,
         default: 0

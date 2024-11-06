@@ -4,6 +4,9 @@ import * as controller from "../controllers/user.controller";
 
 const router: Router = Router();
 
+// [GET] /api/ve/auth
+router.get("/", controller.getUsers);
+
 //[POST] /api/v1/auth/login
 router.post("/login", controller.login);
 

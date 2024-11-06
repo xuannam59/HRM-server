@@ -1,23 +1,16 @@
 import mongoose from "mongoose";
 
 const employeeSchema = new mongoose.Schema({
-    employeeId: String,
+    userId: String,
     fullName: String,
     gender: String,
     birthday: Date,
     phoneNumber: String,
     address: String,
     avatar: String,
-    passport: String,
-    email: String,
     status: String,
-    positionId: String,
-    levelId: String,
-    specializeId: String,
-    departmentId: {
-        type: String,
-        default: ""
-    },
+    role: String,
+    schedule: String,
     deleted: {
         type: Boolean,
         default: false

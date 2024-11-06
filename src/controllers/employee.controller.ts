@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import Employee from "../models/employee.model";
 import md5 from "md5";
-import Position from "../models/position.model";
-import Level from "../models/level.model";
-import Specialize from "../models/specialize.modal";
-import Department from "../models/department.model";
+
 
 // [GET] /employees
 export const getEmployees = async (req: Request, res: Response) => {
@@ -35,42 +32,10 @@ export const getEmployees = async (req: Request, res: Response) => {
             .limit(objectPagination.pageSize)
             .sort({ createdAt: "desc" });
 
-        const items: any[] = [];
-        for (const item of employees) {
-            const infoPosition = await Position.findOne({
-                _id: item.positionId,
-                deleted: false
-            }).select("title");
-            const infoLevel = await Level.findOne({
-                _id: item.levelId,
-                deleted: false
-            });
-            const infoSpecialize = await Specialize.findOne({
-                _id: item.specializeId,
-                deleted: false
-            });
-            let titleDepartmentId: string = "";
-            if (item.departmentId !== "") {
-                const infoDepartment = await Department.findOne({
-                    _id: item.departmentId,
-                    deleted: false
-                });
-                titleDepartmentId = infoDepartment?.title;
-            }
-
-            items.push({
-                ...item._doc,
-                infoPosition: infoPosition?.title,
-                infoLevel: infoLevel?.title,
-                infoSpecialize: infoSpecialize?.title,
-                infoDepartment: titleDepartmentId,
-            })
-        }
-
         res.status(200).json({
             message: "employee",
             meta: objectPagination,
-            data: items,
+            data: employees,
         });
     } catch (error: any) {
         res.status(404).json({
@@ -103,28 +68,15 @@ export const createEmployee = async (req: Request, res: Response) => {
     try {
         const data = req.body;
         const total = await Employee.countDocuments();
-        data.employeeId = "MNV2024" + total;
-        const employee = await Employee.findOne({
-            passport: data.passport,
-            deleted: false
-        });
-
-        if (employee) {
-            throw new Error("Vui lòng nhập đúng thẻ cccd của nhân viên");
-        }
 
         const newEmployee = new Employee(data);
         await newEmployee.save();
-        if (data.departmentId) {
-            await Department.updateOne({
-                _id: newEmployee.departmentId,
-            }, {
-                $push: { employeeList: { employeeId: newEmployee._id } }
-            });
-        }
         res.status(200).json({
             message: "Create Success",
-            data: []
+            data: {
+                _id: newEmployee._id,
+                createdAt: newEmployee.createdAt
+            }
         });
     } catch (error: any) {
         res.status(404).json({
@@ -140,31 +92,10 @@ export const updateEmployee = async (req: Request, res: Response) => {
     try {
         const employee = await Employee.findOne({
             _id: id,
-            passport: data.passport,
             deleted: false
         });
         if (!employee) {
             throw new Error("Nhân viện không hợp lệ!");
-        }
-
-        if (data.password) {
-            data.password = md5(data.password);
-        }
-
-        if (data.departmentId) {
-            await Department.updateOne({
-                "employeeList.employeeId": employee._id
-            }, {
-                $pull: { employeeList: { employeeId: employee._id } }
-            });
-
-            await Department.updateOne({
-                _id: data.departmentId
-            }, {
-                $push: { employeeList: { employeeId: employee._id } }
-            });
-        } else {
-            throw new Error("Phòng ban không hợp lệ");
         }
 
         await Employee.updateOne({ _id: id }, data);
