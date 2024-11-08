@@ -21,7 +21,7 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/specializes", specializeRouter);
 
-    app.use(api + "/departments", departmentRouter);
+    app.use(api + "/salaries", departmentRouter);
 }
 
 export default routerApiV1;

@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
 
-const departmentSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    createdBy: String,
-    updatedBy: String,
-    employeeList: Array,
+const salarySchema = new mongoose.Schema({
+    userId: String,
+    position: String,
+    wage: String,
+    workDay: Number,
+    allowance: Number,
+    advance: Number,
+    status: String,
     deleted: {
         type: Boolean,
         default: false
@@ -15,6 +17,6 @@ const departmentSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const Department = mongoose.model("Department", departmentSchema, "departments");
+const Salary = mongoose.model("Salary", salarySchema, "salaries");
 
-export default Department;
+export default Salary;

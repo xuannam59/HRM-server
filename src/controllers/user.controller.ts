@@ -4,6 +4,7 @@ import md5 from "md5";
 import getAccessToken from "../utils/getAccessToken";
 import { generateRandomNumber } from "../utils/generateRandomText";
 import Employees from "../models/employee.model";
+import { json } from "stream/consumers";
 
 // [GET] /user
 export const getUsers = async (req: Request, res: Response) => {
@@ -46,6 +47,28 @@ export const getUsers = async (req: Request, res: Response) => {
         });
     }
 
+}
+
+// [GET] /user/not-account
+export const getNotAccount = async (req: Request, res: Response) => {
+    try {
+        const user = await User.find({}).select("_id");
+        const ids = user.map(item => {
+            return item._id
+        });
+        const employee = await Employees.find({
+            userId: { $nin: ids }
+        }).select("_id fullName")
+
+        res.status(200).json({
+            message: "not account",
+            data: employee,
+        })
+    } catch (error) {
+        res.status(404).json({
+            message: error.massage
+        })
+    }
 }
 
 // [POST] /auth/register
@@ -91,6 +114,74 @@ export const register = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Register",
             data: newUser,
+        });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message,
+        });
+    }
+}
+
+// [PATCH] /auth/update/:id
+export const update = async (req: Request, res: Response) => {
+    const body = req.body;
+    const id: string = req.params.id;
+    const {
+        password,
+        confirmPassword,
+    } = body
+
+    try {
+        const isExist = await User.findOne({
+            _id: id,
+            deleted: false
+        });
+        if (!isExist) {
+            throw new Error("Tài khoản không tồn tại");
+        }
+        if (password && confirmPassword) {
+            if (password !== confirmPassword) {
+                throw new Error("Password với confirmPassword không giống nhau!");
+            }
+            body.password = md5(body.password);
+        }
+        const data = {
+            fullName: body.fullName,
+            email: body.email,
+            password: body.password ? body.password : isExist.password,
+            role: body.role,
+            employeeId: body.employeeId,
+        }
+        const result = await User.updateOne({ _id: id }, data);
+
+        res.status(200).json({
+            message: "Update",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message,
+        });
+    }
+}
+
+// [DELETE] /auth/deleted/:id
+export const deleteUser = async (req: Request, res: Response) => {
+    const id: string = req.params.id;
+    try {
+        const isExist = await User.findOne({
+            _id: id,
+            deleted: false
+        });
+        if (!isExist) {
+            throw new Error("Tài khoản không tồn tại");
+        }
+        const result = await User.deleteOne({
+            _id: id
+        })
+        res.status(200).json({
+            message: "Deleted user",
+            data: result,
         });
     } catch (error: any) {
         res.status(404).json({
