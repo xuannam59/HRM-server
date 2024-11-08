@@ -3,7 +3,7 @@ import { userRouter } from "./user.router";
 import { employeeRouter } from "./employee.router";
 import { verifyToken } from "../middlewares/verifyToken.middleware";
 import { positionRouter } from "./position.router";
-import { levelRouter } from "./level.router";
+import { applicationRouter } from "./application.router";
 import { specializeRouter } from "./specialize.router";
 import { departmentRouter } from "./department.router";
 
@@ -17,7 +17,7 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/positions", positionRouter);
 
-    app.use(api + "/levels", levelRouter);
+    app.use(api + "/applications", applicationRouter);
 
     app.use(api + "/specializes", specializeRouter);
 
