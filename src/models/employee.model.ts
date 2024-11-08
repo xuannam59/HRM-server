@@ -8,10 +8,9 @@ const employeeSchema = new mongoose.Schema({
     phoneNumber: String,
     address: String,
     avatar: String,
-    specialize: String,
+    position: String,
     status: String,
     role: String,
-    schedule: String,
     deleted: {
         type: Boolean,
         default: false
@@ -21,6 +20,6 @@ const employeeSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const Employees = mongoose.model("Employees", employeeSchema, "employees");
+const Employee = mongoose.model("Employee", employeeSchema, "employees");
 
-export default Employees;
+export default Employee;

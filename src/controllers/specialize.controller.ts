@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Position from "../models/position.model";
+import Position from "../models/schedule.model";
 import Specialize from "../models/specialize.modal";
 import User from "../models/user.model";
 

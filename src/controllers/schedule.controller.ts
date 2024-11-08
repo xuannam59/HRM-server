@@ -1,43 +1,37 @@
 import { Request, Response } from "express";
-import Position from "../models/position.model";
-import User from "../models/user.model";
+import Schedule from "../models/schedule.model";
+import Employees from "../models/employee.model";
 
-// [GET] /positions
-export const getPositions = async (req: Request, res: Response) => {
+// [GET] /schedules
+export const getSchedules = async (req: Request, res: Response) => {
     const { current, pageSize } = req.query
     try {
-        const total = await Position.countDocuments({ deleted: false });
+        const total = await Schedule.countDocuments({ deleted: false });
         const objectPagination: {
             current: number,
             pageSize: number,
             total: number,
         } = {
-            current: Number(current),
-            pageSize: Number(pageSize),
+            current: +current,
+            pageSize: +pageSize,
             total: total,
         };
 
         const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
-        const positions: any = await Position
+        const schedules = await Schedule
             .find({ deleted: false, })
             .skip(skip)
-            .limit(objectPagination.pageSize);
+            .limit(objectPagination.pageSize)
+            .populate("employeeId", "_id fullName")
+            .sort({
+                day: "asc",
+                startTime: "asc"
+            });
 
-        const items: any[] = [];
-        for (const item of positions) {
-            const infoUser = await User.findOne({
-                _id: item.createdBy,
-                deleted: false
-            }).select("fullName");
-            items.push({
-                ...item._doc,
-                infoCreatedBy: infoUser?.fullName,
-            })
-        }
 
         res.status(200).json({
-            message: "Get position",
-            data: items,
+            message: "Get schedules",
+            data: schedules,
             meta: objectPagination
         });
     } catch (error: any) {
@@ -47,16 +41,18 @@ export const getPositions = async (req: Request, res: Response) => {
     }
 }
 
-//[GET]/positions/all
-export const getAllPosition = async (req: Request, res: Response) => {
+//[GET] /schedules/:userId
+export const getSchedulesById = async (req: Request, res: Response) => {
+    const userId = req.params.userId
     try {
-        const allPosition = await Position.find({
+        const schedules = await Schedule.find({
+            employeeId: userId,
             deleted: false
         });
 
         res.status(200).json({
-            message: "All position",
-            data: allPosition
+            message: "Get schedules by id",
+            data: schedules
         });
     } catch (error: any) {
         res.status(404).json({
@@ -65,25 +61,40 @@ export const getAllPosition = async (req: Request, res: Response) => {
     }
 }
 
+// [GET] /schedules/teacher
+export const getTeachers = async (req: Request, res: Response) => {
+    try {
+        const teachers = await Employees.find({
+            position: "Giáo viên",
+            deleted: false
+        }).select("_id fullName");
 
-// [POST] /positions/create
-export const createPosition = async (req: Request, res: Response) => {
+        res.status(200).json({
+            message: "Get teachers",
+            data: teachers
+        });
+    } catch (error) {
+        res.status(404).json({
+            message: error.message
+        });
+    }
+}
+
+// [POST] /schedules/create
+export const createSchedule = async (req: Request, res: Response) => {
     const data = req.body;
     try {
         delete data.createdAt;
-        const position = await Position.findOne({
+        const schedule = await Schedule.findOne({
             title: data.title,
             deleted: false
         });
-        if (position) {
-            throw new Error("Chữ vụ này đã có!");
-        }
 
-        const newPosition = new Position(data);
-        await newPosition.save();
+        const newSchedule = new Schedule(data);
+        await newSchedule.save();
         res.status(200).json({
             message: "Create position",
-            data: newPosition
+            data: newSchedule
         });
     } catch (error: any) {
         res.status(404).json({
@@ -92,19 +103,19 @@ export const createPosition = async (req: Request, res: Response) => {
     }
 }
 
-// [POST] /positions/edit/:id
+// [POST] /schedules/edit/:id
 export const updatePosition = async (req: Request, res: Response) => {
     const data = req.body;
     const { id } = req.params;
     try {
-        const position = await Position.findOne({
+        const position = await Schedule.findOne({
             _id: id,
             deleted: false
         });
         if (!position) {
             throw new Error("Chữ vụ này không tồn tại!");
         }
-        await Position.updateOne({ _id: id }, data);
+        await Schedule.updateOne({ _id: id }, data);
         res.status(200).json({
             message: "Update position",
             data: []
@@ -116,18 +127,18 @@ export const updatePosition = async (req: Request, res: Response) => {
     }
 }
 
-// [POST] /positions/delete/:id
+// [POST] /schedules/delete/:id
 export const deletePosition = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const position = await Position.findOne({
+        const position = await Schedule.findOne({
             _id: id,
             deleted: false
         });
         if (!position) {
             throw new Error("Chữ vụ này không tồn tại!");
         }
-        await Position.deleteOne({ _id: id });
+        await Schedule.deleteOne({ _id: id });
         res.status(200).json({
             message: "Delete position",
             data: []

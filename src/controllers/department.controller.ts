@@ -3,7 +3,7 @@ import User from "../models/user.model";
 import Department from "../models/department.model";
 import Employee from "../models/employee.model";
 import { ObjectId } from "mongoose";
-import Position from "../models/position.model";
+import Position from "../models/schedule.model";
 import Specialize from "../models/specialize.modal";
 import { title } from "process";
 import mongoose from "mongoose";
