@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
-import User from "../models/user.model";
 import Department from "../models/department.model";
-import Employee from "../models/employee.model";
-import { ObjectId } from "mongoose";
-import Position from "../models/schedule.model";
-import Specialize from "../models/specialize.modal";
-import { title } from "process";
-import mongoose from "mongoose";
+
 
 // [GET] /departments
 export const getDepartments = async (req: Request, res: Response) => {
@@ -24,27 +18,14 @@ export const getDepartments = async (req: Request, res: Response) => {
         };
 
         const skip: number = (objectPagination.current - 1) * objectPagination.pageSize;
-        const departments: any = await Department
+        const departments = await Department
             .find({ deleted: false, })
             .skip(skip)
             .limit(objectPagination.pageSize);
 
-        const items: any[] = [];
-        for (const item of departments) {
-            const infoUser = await User.findOne({
-                _id: item.createdBy,
-                deleted: false
-            }).select("fullName");
-            items.push({
-                ...item._doc,
-                infoCreatedBy: infoUser?.fullName,
-                employeeQuantity: item.employeeList.length,
-            })
-        }
-
         res.status(200).json({
             message: "Get Department",
-            data: items,
+            data: departments,
             meta: objectPagination
         });
     } catch (error: any) {
