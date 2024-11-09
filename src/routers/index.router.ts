@@ -5,7 +5,7 @@ import { verifyToken } from "../middlewares/verifyToken.middleware";
 import { scheduleRouter } from "./schedule.router";
 import { applicationRouter } from "./application.router";
 import { collaborateRouter } from "./collaborate.router";
-import { departmentRouter } from "./department.router";
+import { fosteringRouter } from "./fostering.router";
 
 const routerApiV1 = (app: Express) => {
     const api: string = "/api/v1"
@@ -21,7 +21,7 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/collaborates", collaborateRouter);//
 
-    app.use(api + "/salaries", departmentRouter);
+    app.use(api + "/fostering", fosteringRouter);
 }
 
 export default routerApiV1;

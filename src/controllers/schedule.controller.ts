@@ -45,10 +45,12 @@ export const getSchedules = async (req: Request, res: Response) => {
 export const getSchedulesById = async (req: Request, res: Response) => {
     const userId = req.params.userId
     try {
-        const schedules = await Schedule.find({
-            employeeId: userId,
-            deleted: false
-        });
+        const schedules = await Schedule
+            .find({
+                employeeId: userId,
+                deleted: false
+            })
+            .populate("employeeId", "_id fullName");
 
         res.status(200).json({
             message: "Get schedules by id",
