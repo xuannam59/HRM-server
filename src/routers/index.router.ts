@@ -7,6 +7,7 @@ import { applicationRouter } from "./application.router";
 import { collaborateRouter } from "./collaborate.router";
 import { fosteringRouter } from "./fostering.router";
 import { rewardDisciplineRouter } from "./rewardDiscipline.router";
+import { salaryRouter } from "./salary.router";
 
 const routerApiV1 = (app: Express) => {
     const api: string = "/api/v1"
@@ -25,6 +26,8 @@ const routerApiV1 = (app: Express) => {
     app.use(api + "/fostering", fosteringRouter);
 
     app.use(api + "/reward-discipline", rewardDisciplineRouter);
+
+    app.use(api + "/salaries", salaryRouter);
 }
 
 export default routerApiV1;
