@@ -86,16 +86,10 @@ export const getTeachers = async (req: Request, res: Response) => {
 export const createSchedule = async (req: Request, res: Response) => {
     const data = req.body;
     try {
-        delete data.createdAt;
-        const schedule = await Schedule.findOne({
-            title: data.title,
-            deleted: false
-        });
-
         const newSchedule = new Schedule(data);
         await newSchedule.save();
         res.status(200).json({
-            message: "Create position",
+            message: "Create schedule",
             data: newSchedule
         });
     } catch (error: any) {
@@ -106,20 +100,20 @@ export const createSchedule = async (req: Request, res: Response) => {
 }
 
 // [POST] /schedules/edit/:id
-export const updatePosition = async (req: Request, res: Response) => {
+export const updateSchedule = async (req: Request, res: Response) => {
     const data = req.body;
     const { id } = req.params;
     try {
-        const position = await Schedule.findOne({
+        const schedule = await Schedule.findOne({
             _id: id,
             deleted: false
         });
-        if (!position) {
+        if (!schedule) {
             throw new Error("Chữ vụ này không tồn tại!");
         }
         await Schedule.updateOne({ _id: id }, data);
         res.status(200).json({
-            message: "Update position",
+            message: "Update schedule",
             data: []
         });
     } catch (error: any) {
@@ -130,19 +124,19 @@ export const updatePosition = async (req: Request, res: Response) => {
 }
 
 // [POST] /schedules/delete/:id
-export const deletePosition = async (req: Request, res: Response) => {
+export const deleteSchedule = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const position = await Schedule.findOne({
+        const schedule = await Schedule.findOne({
             _id: id,
             deleted: false
         });
-        if (!position) {
+        if (!schedule) {
             throw new Error("Chữ vụ này không tồn tại!");
         }
         await Schedule.deleteOne({ _id: id });
         res.status(200).json({
-            message: "Delete position",
+            message: "Delete schedule",
             data: []
         });
     } catch (error: any) {

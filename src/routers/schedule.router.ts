@@ -11,9 +11,9 @@ router.get("/:userId", controller.getSchedulesById);
 
 router.post("/create", controller.createSchedule);
 
-router.patch("/update/:id", controller.updatePosition);
+router.patch("/update/:id", controller.updateSchedule);
 
-router.delete("/delete/:id", controller.deletePosition);
+router.delete("/delete/:id", controller.deleteSchedule);
 
 
 export const scheduleRouter: Router = router;

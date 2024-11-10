@@ -6,6 +6,7 @@ import { scheduleRouter } from "./schedule.router";
 import { applicationRouter } from "./application.router";
 import { collaborateRouter } from "./collaborate.router";
 import { fosteringRouter } from "./fostering.router";
+import { rewardDisciplineRouter } from "./rewardDiscipline.router";
 
 const routerApiV1 = (app: Express) => {
     const api: string = "/api/v1"
@@ -19,9 +20,11 @@ const routerApiV1 = (app: Express) => {
 
     app.use(api + "/applications", applicationRouter);
 
-    app.use(api + "/collaborates", collaborateRouter);//
+    app.use(api + "/collaborates", collaborateRouter);
 
     app.use(api + "/fostering", fosteringRouter);
+
+    app.use(api + "/reward-discipline", rewardDisciplineRouter);
 }
 
 export default routerApiV1;
